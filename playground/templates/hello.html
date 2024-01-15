@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  {%if name %}
+  <h1>hello {{name}}</h1>
+  {%else%}
+  <h1>hello world</h1>
+  {%endif%}
+  <p>{{count}}</p>
+  <!-- {% for order in orders%}
+       <p>Order ID: {{ order.id }}</p>
+        <p>Placed At: {{ order.placed_at }}</p>
+        <p>Customer: {{ order.customer.first_name }}</p>
+
+        <ul>
+            {% for order_item in order.orderitem_set.all %}
+                <li>Product: {{ order_item.product.title }}</li>
+                <li>Quantity: {{ order_item.quantity }}</li>
+            {% endfor %}
+        </ul> -->
+  <!-- <h1>placed at{{product.placed_at}}</h1>
+  <h2>customer{{product.customer_id}}</h2>
+  <h3>order id {{product.id}}</h3>   -->
+
+  {%endfor%}  
+</body>
+</html>
