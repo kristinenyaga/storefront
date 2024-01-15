@@ -4,8 +4,6 @@ from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.db.models import Count, F
 from django.utils.html import format_html, urlencode
-from django.contrib.contenttypes.admin import GenericTabularInline
-from tags.models import TaggedItem
 from django.urls import reverse
 from . import models
 # Register your models here.
@@ -41,9 +39,6 @@ class CollectionAdmin(admin.ModelAdmin):
     )
   
   # // get_queryset is used to customize the queryset that is used to populate the list of collections in the admin interface. By default, it returns all collections.
-class TagInline(GenericTabularInline):
-  model=TaggedItem
-  autocomplete_fields=['tag']
 
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -56,8 +51,6 @@ class ProductAdmin(admin.ModelAdmin):
   prepopulated_fields={'slug':['title']}
   autocomplete_fields=['collection']
   search_fields=['title']
-  inlines=[TagInline]
-
 
 
   @admin.display(ordering='inventory')
