@@ -15,9 +15,11 @@ def products(request):
   
   elif request.method == 'POST':
     serializer = ProductSerializer(data=request.data)
-    return Response("ok")
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data,status=201)
 
-@api_view()
+@api_view(['GET','PUT','PATCH','DELETE'])
 def product_detail(request,id):
   # try:
   #   product = Product.objects.get(id=id)
@@ -26,8 +28,20 @@ def product_detail(request,id):
   # except Product.DoesNotExist:
   #   return Response(status=404)
   product=get_object_or_404(Product,pk=id)
-  seerializer = ProductSerializer(product)
-  return Response(seerializer.data)
+  if request.method == 'GET':
+    serializer = ProductSerializer(product)
+    return Response(serializer.data,status=200)
+  elif request.method == 'PUT':
+    serializer = ProductSerializer(product,data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data,status=200)
+  elif request.method == 'DELETE':
+    if product.orderitems.count()>0:
+      return Response({'error':'The product cannot be deleted as it has an associated order item'},status=401)
+    else:
+      product.delete()
+      return Response(status=204)
 
 @api_view()
 def collection_detail(request,pk):
