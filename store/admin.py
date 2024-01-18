@@ -35,7 +35,7 @@ class CollectionAdmin(admin.ModelAdmin):
 
   def get_queryset(self, request: HttpRequest) -> QuerySet:
     return super().get_queryset(request).annotate(
-      products_count=Count('product')
+      products_count=Count('products')
     )
   
   # // get_queryset is used to customize the queryset that is used to populate the list of collections in the admin interface. By default, it returns all collections.

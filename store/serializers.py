@@ -2,9 +2,14 @@ from rest_framework import serializers
 from rest_framework.relations import HyperlinkedRelatedField
 from decimal import Decimal
 from .models import Collection, Product
-class CollectionSerializer(serializers.Serializer):
-  title = serializers.CharField(max_length=255)
-  id = serializers.IntegerField()
+class CollectionSerializer(serializers.ModelSerializer):
+  product_count= serializers.SerializerMethodField(method_name='get_product_count')
+  class Meta:
+    model=Collection
+    fields=['id','title','product_count']
+
+  def get_product_count(self,collection):
+    return collection.products.count()
 
 class ProductSerializer(serializers.ModelSerializer):
   class Meta:

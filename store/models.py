@@ -28,7 +28,7 @@ class Product(models.Model):
     )  
   inventory=models.IntegerField(default=0,validators=[MinValueValidator(0)])
   last_update=models.DateTimeField(auto_now=True)
-  collection= models.ForeignKey(Collection, on_delete=models.PROTECT)
+  collection= models.ForeignKey(Collection, on_delete=models.PROTECT,related_name='products')
   slug = models.SlugField(default='',blank=True)
   # //auto_now updates a field to the current date and time every time the object is saved, including when it is first created. It reflects the last modification time.
   # //protect means that when a collection is deleted, the product will not be deleted, but an error will be raised instead.
