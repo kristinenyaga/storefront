@@ -5,8 +5,8 @@ from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIVi
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.viewsets import ModelViewSet
-from .models import Product,Collection,OrderItem
-from .serializers import ProductSerializer,CollectionSerializer
+from .models import Product,Collection,OrderItem,Review
+from .serializers import ProductSerializer,CollectionSerializer,ReviewSerializer
 # Create your views here.
 
 class ProductViewSet(ModelViewSet):
@@ -28,38 +28,15 @@ class CollectionViewSet(ModelViewSet):
       return Response({'error':'The collection cannot be deleted as it has associated products'},status=401)
     return super().destroy(request, *args, **kwargs)
   
-
-
-class ProductList(ListCreateAPIView):
-  queryset=Product.objects.select_related('collection').all()
-  serializer_class=ProductSerializer
-
-class ProductDetail(RetrieveUpdateDestroyAPIView):
-  queryset=Product.objects.select_related('collection').all()
-  serializer_class=ProductSerializer
-
-  def delete(self,pk):
-    product=get_object_or_404(Product,pk=pk)
-    if product.orderitems.count()>0:
-      return Response({'error':'The product cannot be deleted as it has an associated order item'},status=401)
-    else:
-      product.delete()
-      return Response(status=204)
-
-class CollectionDetail(RetrieveUpdateDestroyAPIView):
-  queryset=Collection.objects.all()
-  serializer_class=CollectionSerializer
+class ReviewViewSet(ModelViewSet):
+  def get_queryset(self):
+    return Review.objects.filter(product_id=self.kwargs['product_pk'])
   
-  def delete(self,pk):
-    collection=get_object_or_404(Collection,pk=pk)
-    if collection.products.count()>0:
-      return Response({'error':'The collection cannot be deleted as it has associated products'},status=401)
-    else:
-      collection.delete()
-      return Response(status=204)
-  
-class CollectionList(ListCreateAPIView):
-  queryset=Collection.objects.all()
-  serializer_class=CollectionSerializer
+  serializer_class = ReviewSerializer
+
+  def get_serializer_context(self):
+    return {'product_id':self.kwargs['product_pk']}
+
+
 
   

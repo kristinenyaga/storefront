@@ -96,6 +96,13 @@ class Address(models.Model):
   street=models.CharField(max_length=255)
   city=models.CharField(max_length=255)
   customer=models.OneToOneField(Customer, on_delete=models.CASCADE,primary_key=True)
+
+class Review(models.Model):
+  product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='reviews')
+  description=models.TextField()
+  name= models.CharField(max_length=255)
+  date=models.DateTimeField(auto_now_add=True)
+  
   
 
 
