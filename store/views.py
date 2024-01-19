@@ -3,9 +3,31 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
-from .models import Product,Collection
+from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet
+from .models import Product,Collection,OrderItem
 from .serializers import ProductSerializer,CollectionSerializer
 # Create your views here.
+
+class ProductViewSet(ModelViewSet):
+  queryset=Product.objects.select_related('collection').all()
+  serializer_class=ProductSerializer
+
+  def destroy(self, request, *args, **kwargs):
+    if OrderItem.objects.filter(product_id=kwargs['pk']).count()>0:
+      return Response({'error':'The product cannot be deleted as it has an associated order item'},status=401)
+    return super().destroy(request, *args, **kwargs)
+
+    
+class CollectionViewSet(ModelViewSet):
+  queryset=Collection.objects.all()
+  serializer_class=CollectionSerializer
+
+  def destroy(self, request, *args, **kwargs):
+    if Product.objects.filter(collection_id=kwargs['pk']).count()>0:
+      return Response({'error':'The collection cannot be deleted as it has associated products'},status=401)
+    return super().destroy(request, *args, **kwargs)
+  
 
 
 class ProductList(ListCreateAPIView):
@@ -13,12 +35,6 @@ class ProductList(ListCreateAPIView):
   serializer_class=ProductSerializer
 
 class ProductDetail(RetrieveUpdateDestroyAPIView):
-  # try:
-  #   product = Product.objects.get(id=id)
-  #   serializer = ProductSerializer(product)
-  #   return Response(serializer.data)
-  # except Product.DoesNotExist:
-  #   return Response(status=404)
   queryset=Product.objects.select_related('collection').all()
   serializer_class=ProductSerializer
 
