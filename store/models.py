@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+from uuid import uuid4
 class Promotion(models.Model):
   description=models.CharField(max_length=255)
   discount=models.FloatField()
@@ -40,15 +41,21 @@ class Product(models.Model):
     ordering=['title']
 
 class Cart(models.Model):
+  id = models.UUIDField(primary_key=True,default=uuid4)
   created_at=models.DateTimeField(auto_now_add=True)
   # //auto_now_add sets a field to the current date and time when an object is first created. It remains the same even after updates.
 
+
+
 class CartItem(models.Model):
-  cart=models.ForeignKey(Cart,on_delete=models.CASCADE)
+  cart=models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
   product=models.ForeignKey(Product,on_delete=models.CASCADE)
   # //on_delete=models.CASCADE means that when a product is deleted, all of its cart items will be deleted as well.
   quantity=models.PositiveSmallIntegerField()
-  unitPrice=models.DecimalField(max_digits=6,decimal_places=2)
+
+
+  class Meta:
+    unique_together=[['cart','product']]
 
 class Customer(models.Model):
   MEMBERSHIP_BRONZE='B'
