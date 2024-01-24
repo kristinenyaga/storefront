@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'playground',
     'store',
-    'store_custom',
     'tags',
-    'likes'
+    'likes',
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -140,3 +140,6 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE':10,
 }
+
+AUTH_USER_MODEL='core.User'
+#AUTH_USER_MODEL is used to specify the user model that will be used by the authentication system.
