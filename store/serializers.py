@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from rest_framework.relations import HyperlinkedRelatedField
 from decimal import Decimal
-from .models import Collection, Product, Review,Cart,CartItem
+from .models import Collection, Product, Review,Cart,CartItem,Customer
+
+class CustomerSerializer(serializers.ModelSerializer):
+  user_id=serializers.IntegerField()
+  class Meta:
+    model=Customer
+    fields=['id','user_id','phone','birth_date','membership']
+
 class CollectionSerializer(serializers.ModelSerializer):
   product_count= serializers.SerializerMethodField(method_name='get_product_count')
   class Meta:
