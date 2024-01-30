@@ -75,6 +75,9 @@ class Customer(models.Model):
   # //choices is a list of two-tuples. The first element in each tuple is the actual value to be set on the model, and the second element is the human-readable name.
   class Meta:
     db_table='store_customers'
+    permissions=[
+      ('view_history','Can view customer'),
+    ]
   
   def __str__(self) -> str:
     return f'{self.user.first_name} {self.user.last_name}'
