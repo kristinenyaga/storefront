@@ -6,6 +6,7 @@ from  django.urls.conf import include
 from pprint import pprint
 router=DefaultRouter()
 
+router.register('customers',views.CustomerViewSet)
 router.register('products',views.ProductViewSet,basename='product')
 router.register('collections',views.CollectionViewSet)
 router.register('carts',views.CartViewSet,basename='cart')
