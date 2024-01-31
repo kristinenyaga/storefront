@@ -7,7 +7,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser,IsAuthenticated,IsAdminUser,AllowAny
 from rest_framework.decorators import action
 from .models import Product,Collection,OrderItem,Review,Cart,CartItem,Customer,Order
-from .serializers import CustomerSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer
+from .serializers import CustomerSerializer, ProductSerializer,CollectionSerializer,ReviewSerializer,CartSerializer,CartItemSerializer,AddCartItemSerializer,UpdateCartItemSerializer,OrderSerializer,CreateOrderSerializer,UpdateOrderSerializer
 from .filters import ProductFilter  
 
 from .permissions import IsAdminOrReadOnly,CanViewHistory
@@ -26,7 +26,7 @@ class CustomerViewSet(ModelViewSet):
 
   @action(detail=False,methods=['GET','PUT','PATCH'],permission_classes=[IsAuthenticated])
   def me(self,request):
-    (customer,created) = Customer.objects.get_or_create(user_id=request.user.id)
+    customer = Customer.objects.get(user_id=request.user.id)
     if request.method == 'GET':
       serializer=CustomerSerializer(customer)
       return Response(serializer.data)
@@ -40,9 +40,6 @@ class CustomerViewSet(ModelViewSet):
   @action(detail=True,methods=['GET'],permission_classes=[CanViewHistory])
   def history(self,request,pk):
     return Response("ok")
-
-  
-
 
 
 class ProductViewSet(ModelViewSet):
@@ -113,4 +110,38 @@ class CartItemViewSet(ModelViewSet):
     return {'cart_id':self.kwargs['cart_pk']}
   
 class OrderViewSet(ModelViewSet):
-  queryset=Order.objects.all()
+  http_method_names=['get','patch','options','head','delete']
+  def get_permissions(self):
+    if self.request.method in ['PATCH','DELETE']:
+      return [IsAdminUser()]
+    return [IsAuthenticated()]
+
+  def get_serializer_class(self):
+    if self.request.method == 'POST':
+      return CreateOrderSerializer
+    elif self.request.method == 'PATCH':
+      return UpdateOrderSerializer
+    return OrderSerializer
+
+
+  def get_queryset(self):
+    user=self.request.user
+    if user.is_staff:
+      return Order.objects.all()  
+    customer=Customer.objects.only('id').get(user_id=user.id)
+    return Order.objects.filter(customer_id=customer)
+  
+  def create(self, request, *args, **kwargs):
+    serializer = CreateOrderSerializer(data=request.data,context={'user_id':self.request.user.id})
+    serializer.is_valid(raise_exception=True)
+    order=serializer.save()
+    order_serializer=OrderSerializer(order)
+    return Response(
+      {"order": order_serializer.data, "cart_id": serializer.validated_data.get("cart_id")},
+      status=201
+        )
+
+    
+
+  # def get_queryset(self):
+  #   return super().get_queryset()
