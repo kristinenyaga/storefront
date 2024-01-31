@@ -110,8 +110,8 @@ class Order(models.Model):
     # // permissions is a list of two-tuples. The first element in each tuple is the permission code, and the second element is the human-readable name.
 
 class OrderItem(models.Model):
-  order=models.ForeignKey(Order,on_delete=models.PROTECT)
-  product=models.ForeignKey(Product,on_delete=models.PROTECT,related_name='orderitems')
+  order=models.ForeignKey(Order,on_delete=models.PROTECT,related_name='orderitems')
+  product=models.ForeignKey(Product,on_delete=models.PROTECT)
   quantity=models.PositiveSmallIntegerField()
   unit_price=models.DecimalField(max_digits=6,decimal_places=2)
 
